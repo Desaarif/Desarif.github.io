@@ -1,59 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>Kalkulator Titik Lampu SNI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator AC Sesuai SNI</title>
   <style>
-    body { font-family: Arial; margin: 20px; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 200px; padding: 5px; }
+    body { font-family: Arial; padding: 20px; }
+    input { padding: 5px; margin: 5px; width: 100%; }
+    .container { max-width: 400px; margin: auto; }
+    .result { margin-top: 20px; font-size: 18px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h2>Kalkulator Titik Lampu Sesuai SNI</h2>
+  <div class="container">
+    <h2>Kalkulator Kebutuhan AC (Sesuai SNI)</h2>
 
-  <label>Luas Ruangan (m²)</label>
-  <input type="number" id="luas" placeholder="contoh: 30">
+    <label>Luas Ruangan (m²):</label>
+    <input type="number" id="luas" step="0.1">
 
-  <label>Iluminansi yang Dibutuhkan (lux)</label>
-  <select id="iluminansi">
-    <option value="250">Ruang Kelas (250 lux)</option>
-    <option value="300">Ruang Kantor (300 lux)</option>
-    <option value="100">Gudang (100 lux)</option>
-    <option value="500">Laboratorium (500 lux)</option>
-  </select>
+    <label>Jumlah Orang:</label>
+    <input type="number" id="orang">
 
-  <label>Fluks Cahaya per Lampu (lumen)</label>
-  <input type="number" id="lumen" placeholder="contoh: 800">
+    <label>Jumlah Peralatan Elektronik Besar:</label>
+    <input type="number" id="alat">
 
-  <label>Utilization Factor (UF)</label>
-  <input type="number" id="uf" value="0.6" step="0.1">
+    <button onclick="hitungAC()">Hitung Kebutuhan AC</button>
 
-  <label>Maintenance Factor (MF)</label>
-  <input type="number" id="mf" value="0.8" step="0.1">
-
-  <br><br>
-  <button onclick="hitungLampu()">Hitung Jumlah Lampu</button>
-
-  <h3 id="hasil"></h3>
+    <div class="result" id="hasil"></div>
+  </div>
 
   <script>
-    function hitungLampu() {
+    function hitungAC() {
       const luas = parseFloat(document.getElementById('luas').value);
-      const E = parseFloat(document.getElementById('iluminansi').value);
-      const F = parseFloat(document.getElementById('lumen').value);
-      const UF = parseFloat(document.getElementById('uf').value);
-      const MF = parseFloat(document.getElementById('mf').value);
+      const orang = parseFloat(document.getElementById('orang').value);
+      const alat = parseFloat(document.getElementById('alat').value);
 
-      if (isNaN(luas) || isNaN(E) || isNaN(F) || isNaN(UF) || isNaN(MF)) {
-        document.getElementById('hasil').innerText = "Harap isi semua data dengan benar.";
+      if (!luas || luas <= 0) {
+        document.getElementById('hasil').innerText = 'Masukkan luas ruangan yang valid';
         return;
       }
 
-      const Etot = E * luas;
-      const N = Etot / (F * UF * MF);
-      const hasil = Math.ceil(N);
+      const btu = (luas * 500) + (orang * 600) + (alat * 300);
+      const pk = btu / 9000;
 
-      document.getElementById('hasil').innerText = `Jumlah titik lampu yang dibutuhkan: ${hasil}`;
+      const rekom = pk <= 0.5 ? '0.5 PK' : pk <= 1 ? '1 PK' : pk <= 1.5 ? '1.5 PK' : pk <= 2 ? '2 PK' : `${Math.ceil(pk)} PK`;
+
+      document.getElementById('hasil').innerHTML = `
+        Total kebutuhan pendinginan: <b>${Math.round(btu)} BTU/h</b><br>
+        Rekomendasi: <b>${rekom} (${pk.toFixed(2)} PK)</b>
+      `;
     }
   </script>
 </body>
